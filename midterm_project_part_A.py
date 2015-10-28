@@ -124,15 +124,6 @@ class Dolphins:        ### basic dolphin class
             return False
 
 
-# def select_name(boys, girls):
-#     sex = random.sample(['Male', 'Female'], 1)[0]
-#     if sex == 'Male':
-#         childname = random.sample(boys, 1)[0]
-#     else:
-#         childname = random.sample(girls, 1)[0]
-#
-#     return (childname, sex)             # it returns a tuple
-
 
 def nextgen(partner1, partner2, dict1, dict2, malegen, femalegen):
 
@@ -150,14 +141,18 @@ def nextgen(partner1, partner2, dict1, dict2, malegen, femalegen):
         child_sex = random.sample(['Male', 'Female'], 1)[0]
         if child_sex == 'Male':
             child_name = malegen.next()
+            while child_name in dict1 or child_name in dict2:    # to check if the name is repeated
+                child_name = malegen.next()
             dict1[child_name] = Dolphins(child_name, child_sex, mother, father)
         if child_sex == 'Female':
             child_name = femalegen.next()
+            while child_name in dict1 or child_name in dict2:
+                child_name = femalegen.next()
             dict2[child_name] = Dolphins(child_name, child_sex, mother, father)
         partner1.refracperiod = 0
         partner2.refracperiod = 0
         # return 'A {:s} baby dolphin named {:s} is bron!'.format(child_sex, child_name)
-        return 1
+        return 1    # return 1 for later use
 
 
 # to initialize the very first four dolphins

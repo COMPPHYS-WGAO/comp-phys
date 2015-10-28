@@ -131,10 +131,14 @@ def nextgen(partner1, partner2, dict1, dict2, malegen, femalegen, prob):
         p = random.random()          # generates random numbers from 0-1
         if p <= prob:                 # ideally prob should be 0.5 
             child_name = malegen.next()
+            while child_name in dict1 or child_name in dict2:    # to check if the name is repeated
+                child_name = malegen.next()
             dict1[child_name] = Dolphins(child_name, 'Male', mother, father)
             # this is where we create new dolphins (male)
         else:
             child_name = femalegen.next()
+            while child_name in dict1 or child_name in dict2:    # to check if the name is repeated
+                child_name = femalegen.next()
             dict2[child_name] = Dolphins(child_name, 'Female', mother, father)
         partner1.refracperiod = 0     # make sure the refraction period is kept tracking
         partner2.refracperiod = 0

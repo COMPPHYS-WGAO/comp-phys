@@ -57,8 +57,8 @@ def namegenerator(sex):
 
 
 
-if os.path.isfile(boynames_file):
-    ''
+if os.path.isfile(boynames_file):    # check if the file already existed -- save time
+    print 'Midterm I project, Part C: Genealogy Tree'
 else:
             
     i = 1
@@ -110,12 +110,12 @@ class Dolphins:        ### basic dolphin class
 
     def legal(self, partner):
         if partner.sex != self.sex\
-        and self.age >= 8 \
+        and self.age >= 8\
         and partner.age >= 8\
         and np.abs(self.age - partner.age) <= 10\
-        and self.mom != partner.mom \
+        and self.mom != partner.mom\
         and self.dad != partner.dad\
-        and self.refracperiod > 5 \
+        and self.refracperiod > 5\
         and partner.refracperiod > 5\
         and self.age <= self.death\
         and partner.age <= partner.death:
@@ -141,32 +141,36 @@ def nextgen(partner1, partner2, dict1, dict2, malegen, femalegen):
         child_sex = random.sample(['Male', 'Female'], 1)[0]
         if child_sex == 'Male':
             child_name = malegen.next()
+            while child_name in dict1 or child_name in dict2:    # to check if the name is repeated
+                child_name = malegen.next()
             dict1[child_name] = Dolphins(child_name, child_sex, mother, father)
         if child_sex == 'Female':
             child_name = femalegen.next()
+            while child_name in dict1 or child_name in dict2:
+                child_name = femalegen.next()
             dict2[child_name] = Dolphins(child_name, child_sex, mother, father)
         partner1.refracperiod = 0
         partner2.refracperiod = 0
         # return 'A {:s} baby dolphin named {:s} is bron!'.format(child_sex, child_name)
-        return 1
+        return 1    # return 1 for later use
 
 
 ####################################################################################
 
-m_dolphinlist = []
-f_dolphinlist = []# initialize to track dictionary at the end of each trial
-living_dolphins = []
-dolphin_pop_75 = []
+m_dolphinlist = []    # initialize to track dictionary at the end of each trial,
+f_dolphinlist = []    # thus it will become a list of 10 dictionaries by the end of the following giant for loop 
+living_dolphins = []  # list of [*lists of names of dolphins each year for each trial]
+dolphin_pop_75 = []   # a list of living dolphin names at year 75 for each trial, thus will have 10 elements
 for i in range(1, 11):
     m_dolphinlist.append('dolphinherd'+str(i))
     f_dolphinlist.append('dolphinherd'+str(i))
     living_dolphins.append(i)                       # each element will be overwritten/given a meaningful value later
 
 
-for trial in range(10):
+for trial in range(10):             # to iterrate through 10 trials, using a for loop
     print('Trial No.', trial+1)
 
-    malegenerator = namegenerator('Male')
+    malegenerator = namegenerator('Male')          # call names from namegenerator
     femalegenerator = namegenerator('Female')
 
     m_dolphinlist[trial] = {'Alex': Dolphins('Alex', 'Male', 'Jane', 'Irvine'),\
@@ -179,41 +183,41 @@ for trial in range(10):
     deaths = []
     living_dolphins[trial] = []
     while years < 150:
-        mkeys = m_dolphinlist[trial].keys()
-        fkeys = f_dolphinlist[trial].keys()# temp1 is the list entering the year
-        # print len(temp1)
-        breeding = 0
-        for dolphin in mkeys:
+        mkeys = m_dolphinlist[trial].keys()    # list of male names entering the year
+        fkeys = f_dolphinlist[trial].keys()    # same for females
+        breeding = 0    # breeding number updates every year
+        for dolphin in mkeys:    # check if any pair of the males and the females are able to make baby
             for partner in fkeys:
                 cool = nextgen(m_dolphinlist[trial][dolphin], f_dolphinlist[trial][partner], m_dolphinlist[trial], f_dolphinlist[trial], malegenerator, femalegenerator)
                 # nextgen() takes 3 arguments: partner1, partner2, and current dolphin dictionary
+                # and the function will return 1(as a check mark) if a baby is born
                 if cool == 1:
                     breeding += cool
         for elder in mkeys:
-            m_dolphinlist[trial][elder].update()# check if any is too old
+            m_dolphinlist[trial][elder].update()    # check if any male is too old
             if m_dolphinlist[trial][elder].age >= m_dolphinlist[trial][elder].death:
                 if elder not in deaths:
                     deaths.append(elder)
         for elder in fkeys:
-            f_dolphinlist[trial][elder].update()# check if any is too old
+            f_dolphinlist[trial][elder].update()    # check if any female is too old
             if f_dolphinlist[trial][elder].age >= f_dolphinlist[trial][elder].death:
                 if elder not in deaths:
                     deaths.append(elder)
 
-        # set_trace()
+        # pdb.set_trace()
         mkeys2 = m_dolphinlist[trial].keys()
         fkeys2 = f_dolphinlist[trial].keys()
         living_dolphins[trial].append(len(mkeys2) + len(fkeys2)-len(deaths))
         # living_dolphins[trial] is the list of number of dolphins of each year for each trial
-        # print len(temp2)
+        
         if years % 25 == 0:
             print("#"*50)
             print("Entering year {:d} with {:d} dolphins, with {:d} breeding.".format(years, len(mkeys) + len(fkeys)-len(deaths), abs(len(mkeys2) + len(fkeys2)-len(mkeys)-len(fkeys))))
         if years == 75:
-            m_copy = m_dolphinlist[trial].copy()
-            f_copy = f_dolphinlist[trial].copy()
-            m_copy.update(f_copy)
-            map(m_copy.pop, deaths)
+            m_copy = m_dolphinlist[trial].copy()    # use copy() to make sure that 
+            f_copy = f_dolphinlist[trial].copy()    # the dictionary won't be overwritten as the programm keeps running 
+            m_copy.update(f_copy)                   # use update() to add dictionary 
+            map(m_copy.pop, deaths)                 # use map(dict, [keys]) to remove deaths list from the dolphing herd 
             dolphin_pop_75.append(m_copy)
         if years == 100:
             print("At year {:d}, there are {:d} living dolphins.\nthere have been {:d} births, in total.".format(years, len(mkeys2) + len(fkeys2)-len(deaths), len(mkeys2)+len(fkeys2)-4))
@@ -226,54 +230,58 @@ for trial in range(10):
 
 rand = random.randrange(0, 10)
 
-dolphin_pop = {}
-dolphin_pop.update(dolphin_pop_75[rand])
+# dolphin_pop = {}
+# dolphin_pop.update(dolphin_pop_75[rand])
+print type(dolphin_pop_75[rand])
+dolphin_pop = dolphin_pop_75[rand]
 
+main_char = (random.sample(dolphin_pop, 1))[0]    # randomly pick a name from the dictionay
+main_mom = dolphin_pop[main_char].mom    # find mom's name
+main_dad = dolphin_pop[main_char].dad    # find dad's name
 
-main_char = (random.sample(dolphin_pop, 1))[0]
-main_mom = dolphin_pop[main_char].mom
-main_dad = dolphin_pop[main_char].dad
-
-# full_sib_dad = [(main_char, main_dad)]
-# full_sib_mom = [(main_char, main_mom)]
 full_sib = []
 mom_half = []
 dad_half = []
 
-for dolph in dolphin_pop:
-    if dolphin_pop[dolph].mom == main_mom and dolphin_pop[dolph].dad == main_dad:
-#         full_sib_mom.append((main_mom, dolph))
-#         full_sib_dad.append((main_dad, dolph))
-        full_sib.append(dolph)
-    elif dolphin_pop[dolph].mom == main_mom:
-#         mom_half.append((main_mom, dolph))
-        mom_half.append(dolph)
-    elif dolphin_pop[dolph].dad == main_dad:
-#         dad_half.append((main_dad, dolph))
-        dad_half.append(dolph)
+for dolph in dolphin_pop:    # find siblings and save their names to the corresponding list
+    if dolph != main_char:
+        if dolphin_pop[dolph].mom == main_mom and dolphin_pop[dolph].dad == main_dad:
+            full_sib.append(dolph)
+        elif dolphin_pop[dolph].mom == main_mom:
+            mom_half.append(dolph)
+        elif dolphin_pop[dolph].dad == main_dad:
+            dad_half.append(dolph)
         
 # print full_sib_dad, full_sib_mom, mom_half, dad_half
-print full_sib, mom_half, dad_half
+print 'main:', main_char
+print 'mom:', main_mom
+print 'dad:', main_dad
+print 'full_sib:', full_sib
+print 'half_sib_mom:', mom_half 
+print 'half_sib_dad:', dad_half
 
 G = nx.Graph()
 
-G.add_node(main_mom, pos=(0, 3))
+G.add_node(main_char, pos =(0.5, 2))
+G.add_node(main_mom, pos=(0, 3))    # mom and dad appear at the very top with y = 3
 G.add_node(main_dad, pos=(1, 3))
+G.add_edge(main_char, main_mom)
+G.add_edge(main_char, main_dad)
 
-xh = 0.5
-xf = 0
+xh = 0.73    # initialize the x coordinates
+xf = 1.5
 
 for i in dolphin_pop:
     if i in mom_half:
-        G.add_node(i, pos=(xh, 1))
-        G.add_edge(i, main_mom)
-        xh += 1
+        G.add_node(i, pos=(xh, 1))    # i is the name, pos specifies the coordinates on the graph
+        G.add_edge(i, main_mom)       # add_edge(a, b) draw a line between a and b
+        xh += 1.3                     # increase x coordinate everytime a node is created 
     if i in dad_half:
-        G.add_node(i, pos=(xh, 1))
+        G.add_node(i, pos=(xh, 1))    # half siblings appear at the bottom level, y = 1
         G.add_edge(i, main_dad)
-        xh += 1
+        xh += 1.3
     if i in full_sib:
-        G.add_node(i, pos=(xh, 2))
+        G.add_node(i, pos=(xf, 2))    # full siblings appear at y = 2
         G.add_edge(i, main_mom)
         G.add_edge(i, main_dad)
         xf += 1
@@ -283,5 +291,3 @@ pos = nx.get_node_attributes(G, 'pos')
 nx.draw(G, pos)
 
 plt.show()
-    
-
